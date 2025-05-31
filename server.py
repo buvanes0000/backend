@@ -21,8 +21,12 @@ def check_password_strength(password):
     }
     return strength
 
-@app.route('/api/check-password', methods=['POST'])
+@app.route('/api/check-password', methods=['POST', 'OPTIONS'])
 def check_password():
+    if request.method == 'OPTIONS':
+        # Respond to CORS preflight request
+        return '', 204
+
     data = request.json
     password = data.get('password', '')
 
@@ -34,10 +38,16 @@ def check_password():
 
     return jsonify({"strength": strength, "is_common": is_common})
 
-# Health check endpoint
+# Health check endpoint for Render
 @app.route('/status', methods=['GET'])
 def status():
     return jsonify({"status": "ok"}), 200
 
+# Optional: root endpoint
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"message": "Password Checker API is running"}), 200
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=10000)
+
